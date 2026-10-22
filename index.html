@@ -3,11 +3,185 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mijn chatbot</title>
+  <title>Welk lichtjes-type ben jij?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #121212;
+      --panel: #1d1d1d;
+      --text: #f3f1ee;
+      --muted: #b8b3ac;
+      --accent: #ff5a1f;
+      --accent-soft: #ff8a3d;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Lora", Georgia, "Times New Roman", serif;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+      transition: background .5s;
+    }
+    body.uit { background: #050505; }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+    h1, h2, h3, .pts, .hint {
+      font-family: "Archivo", "Arial Black", Arial, sans-serif;
+      font-weight: 800;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 32px;
+      align-items: center;
+      min-height: 88vh;
+      padding: 56px 0;
+    }
+    h1 {
+      font-size: clamp(2.7rem, 7vw, 5rem);
+      line-height: 1;
+      letter-spacing: -0.025em;
+      margin: 0 0 24px;
+      max-width: 11ch;
+    }
+    .lead { font-size: 1.2rem; max-width: 46ch; margin: 0 0 30px; color: var(--muted); }
+    .hint {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--accent); color: #fff;
+      padding: 14px 24px; border-radius: 999px; font-size: 1rem; font-weight: 700;
+    }
+    .hint::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: #fff; }
+    body.uit .hint { background: #3a3a3a; color: #bbb; }
+    body.uit .hint::before { background: #777; }
+
+    /* Lamp: a glowing dot, like the dots in the logo */
+    .lamp-box { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+    .lamp-btn {
+      background: none; border: 0; cursor: pointer; padding: 0;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .lamp-btn:focus-visible { outline: 3px solid #fff; outline-offset: 10px; border-radius: 16px; }
+    .cord { width: 3px; height: 64px; background: #555; }
+    .shade {
+      width: 200px; height: 120px;
+      background: var(--accent);
+      clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+      filter: drop-shadow(0 0 44px rgba(255, 90, 31, .85));
+      transition: background .4s, filter .4s;
+    }
+    .bulb {
+      width: 64px; height: 64px; margin-top: -16px; border-radius: 50%;
+      background: #ffd2b8;
+      box-shadow: 0 0 70px 30px rgba(255, 90, 31, .7);
+      transition: background .4s, box-shadow .4s;
+    }
+    body.uit .shade { background: #262626; filter: none; }
+    body.uit .bulb { background: #2f2f2f; box-shadow: none; }
+    .lamp-note { margin: 0; text-align: center; max-width: 26ch; color: var(--muted); font-size: .98rem; }
+
+    /* Types */
+    .types { padding: 24px 0 96px; }
+    h2 { font-size: clamp(1.9rem, 4.5vw, 2.8rem); letter-spacing: -0.015em; margin: 0 0 12px; line-height: 1.1; }
+    .sub { margin: 0 0 36px; max-width: 58ch; color: var(--muted); }
+    .scale { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+    .scale li {
+      display: grid; grid-template-columns: 60px 1fr auto; gap: 16px; align-items: center;
+      background: var(--panel); border-radius: 20px; padding: 20px 22px;
+      border-left: 10px solid var(--c);
+    }
+    .scale .emoji { font-size: 2.2rem; text-align: center; }
+    .scale h3 { margin: 0 0 2px; font-size: 1.25rem; }
+    .scale p { margin: 0; font-size: .98rem; color: var(--muted); line-height: 1.55; }
+    .pts { color: var(--c); white-space: nowrap; font-size: 1rem; }
+
+    footer { padding: 0 0 130px; font-size: .95rem; color: var(--muted); }
+
+    @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .lamp-box { order: -1; }
+      .shade { width: 150px; height: 92px; }
+      .scale li { grid-template-columns: 48px 1fr; }
+      .pts { grid-column: 2; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Welkom!</h1>
-  <p>Klik op de chatbubbel rechtsonder om te beginnen.</p>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <h1>Welk lichtjes-type ben jij?</h1>
+        <p class="lead">Laat jij het licht aan als je het huis uit gaat? Beantwoord zes korte vragen in de chat en ontdek of je een energie-ninja bent, of toch eerder een kerstboom-eigenaar.</p>
+        <span class="hint">Open de chat rechtsonder om te starten</span>
+      </div>
+      <div class="lamp-box">
+        <button class="lamp-btn" id="lamp" type="button" aria-pressed="false" aria-label="Zet het licht aan of uit">
+          <span class="cord"></span>
+          <span class="shade"></span>
+          <span class="bulb"></span>
+        </button>
+        <p class="lamp-note" id="lampNote">Tik op de lamp om het licht uit te doen.</p>
+      </div>
+    </section>
+
+    <section class="types">
+      <h2>De vijf types</h2>
+      <p class="sub">Je krijgt punten voor elk antwoord. Hoe meer licht je laat branden, hoe meer punten, en hoe hoger je op de lijst eindigt. Na zes vragen zie je welk type bij jou past.</p>
+      <ul class="scale">
+        <li style="--c: #4cc38a">
+          <span class="emoji">🌱</span>
+          <div><h3>De Energie-Ninja</h3><p>Zodra jij een kamer verlaat, gaat het licht uit. Altijd.</p></div>
+          <span class="pts">0 tot 10 punten</span>
+        </li>
+        <li style="--c: #9bd05a">
+          <span class="emoji">🌿</span>
+          <div><h3>De Bewuste Burger</h3><p>Je denkt er meestal aan en maakt een misser snel weer goed.</p></div>
+          <span class="pts">11 tot 15 punten</span>
+        </li>
+        <li style="--c: #ffc247">
+          <span class="emoji">🌤️</span>
+          <div><h3>De Gemiddelde Nederlander</h3><p>Soms denk je eraan, soms niet. Je zit precies in het midden.</p></div>
+          <span class="pts">16 tot 20 punten</span>
+        </li>
+        <li style="--c: #ff8a3d">
+          <span class="emoji">💡</span>
+          <div><h3>De Lichtjesliefhebber</h3><p>Je houdt van een huis vol licht, ook in lege kamers.</p></div>
+          <span class="pts">21 tot 25 punten</span>
+        </li>
+        <li style="--c: #ff4b1f">
+          <span class="emoji">🎄</span>
+          <div><h3>De Kerstboom-Eigenaar</h3><p>Bij jou brandt het licht bijna altijd, net als een kerstboom die het hele jaar blijft staan.</p></div>
+          <span class="pts">26 tot 30 punten</span>
+        </li>
+      </ul>
+    </section>
+
+    <footer>Een schoolproject over energie besparen.</footer>
+  </main>
+
+  <script>
+    (function () {
+      var lamp = document.getElementById('lamp');
+      var note = document.getElementById('lampNote');
+      lamp.addEventListener('click', function () {
+        var uit = document.body.classList.toggle('uit');
+        lamp.setAttribute('aria-pressed', uit ? 'true' : 'false');
+        note.textContent = uit
+          ? 'Licht uit. Zo bespaar je energie. Tik nog eens om het weer aan te doen.'
+          : 'Tik op de lamp om het licht uit te doen.';
+      });
+    })();
+  </script>
 
   <script type="text/javascript">
     (function(d, t) {
